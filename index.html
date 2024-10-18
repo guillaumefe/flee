@@ -131,6 +131,8 @@
             clueFound: false
         };
 
+        const defaultNPC = 'Kevin Mitnick';
+
         const locations = {
             'Lobby': { 
                 description: 'Vous êtes dans le lobby principal. Des portes mènent vers différents secteurs.', 
@@ -161,21 +163,21 @@
                 }
             },
             'Reinforced Gate': { 
-                description: 'Portail renforcé avec un cadenas sophistiqué. C\'est le premier obstacle vers le Datacenter.', 
+                description: 'Portail renforcé avec un cadenas sophistiqué.', 
                 exits: { 
                     's': { to: 'Control Room', locked: false }, 
                     'e': { to: 'Secured Door', locked: true } 
                 }
             },
             'Secured Door': { 
-                description: 'Porte sécurisée avec un système de badge électronique. Un deuxième obstacle à franchir.', 
+                description: 'Porte sécurisée avec un système de badge électronique.', 
                 exits: { 
                     'o': { to: 'Reinforced Gate', locked: false }, 
                     'n': { to: 'Server Door', locked: true } 
                 }
             },
             'Server Door': { 
-                description: 'Porte du serveur avec un système de clé avancé. Le dernier verrou avant le Datacenter.', 
+                description: 'Porte du serveur avec un système de clé avancé.', 
                 exits: { 
                     's': { to: 'Secured Door', locked: false }, 
                     'e': { to: 'Datacenter', locked: true } 
@@ -202,6 +204,7 @@
             'Control Room': 'Albert Gonzalez',
             'Street': 'Anonymous',
             'Datacenter': 'Linus Torvalds'
+            // Les autres localisations n'ont pas de NPC assigné
         };
 
         const npcHelp = {
@@ -377,7 +380,8 @@
                     setTimeout(() => {
                         gameState.scanResults = ['Port 22 (SSH)', 'Port 80 (HTTP)'];
                         appendOutput("Résultats du scan : Port 22 (SSH) et Port 80 (HTTP) ouverts.");
-                        appendOutput(`${famousHackers[gameState.currentLocation]}: "Ces services sont vulnérables. Utilisez 'hydra' ou 'sqlmap' pour exploiter."`);
+                        const currentNPC = famousHackers[gameState.currentLocation] || defaultNPC;
+                        appendOutput(`${currentNPC}: "Ces services sont vulnérables. Utilisez 'hydra' ou 'sqlmap' pour exploiter."`);
                     }, 2000);
                     break;
                 case 'scan':
@@ -385,7 +389,8 @@
                         appendOutput(`Commande "scan" exécutée. Analyse en cours...`);
                         setTimeout(() => {
                             appendOutput("Analyse terminée : SSH est vulnérable au bruteforce. HTTP est vulnérable à une injection SQL.");
-                            appendOutput(`${famousHackers[gameState.currentLocation]}: "Il est temps d'agir. Utilisez 'hydra' ou 'sqlmap'."`);
+                            const currentNPC = famousHackers[gameState.currentLocation] || defaultNPC;
+                            appendOutput(`${currentNPC}: "Il est temps d'agir. Utilisez 'hydra' ou 'sqlmap'."`);
                         }, 2000);
                     } else {
                         appendOutput("Pas de scan en cours. Exécutez `nmap` d'abord.");
@@ -421,7 +426,7 @@
                     break;
                 case 'help':
                     gameState.helpMode = true;
-                    gameState.selectedNPC = famousHackers[gameState.currentLocation];
+                    gameState.selectedNPC = famousHackers[gameState.currentLocation] || defaultNPC;
                     displayHelp(gameState.selectedNPC);
                     break;
                 case 'look':
@@ -431,7 +436,7 @@
                     talk();
                     break;
                 case 'locpick':
-                    locpick(args);
+                    locpick();
                     break;
                 default:
                     if (['n', 'e', 's', 'o'].includes(command)) {
@@ -457,7 +462,7 @@
                     talk();
                     break;
                 case 'locpick':
-                    locpick(args);
+                    locpick();
                     break;
                 default:
                     if (['n', 'e', 's', 'o', 'locpick'].includes(command)) {
@@ -496,7 +501,9 @@
                 appendOutput(`Vous engagez la conversation avec ${npc}.`);
                 displayTalk(npc);
             } else {
-                appendOutput("Il n'y a personne à qui parler ici.");
+                // Utiliser le NPC par défaut si aucun NPC assigné
+                appendOutput(`Vous engagez la conversation avec ${defaultNPC}.`);
+                displayTalk(defaultNPC);
             }
         }
 
@@ -523,7 +530,8 @@
                     appendOutput("Fuite réussie ! Vous êtes maintenant dans la rue.");
                     gameState.currentLocation = 'Street';
                     appendOutput(locations['Street'].description);
-                    appendOutput(`Hacker en charge: ${famousHackers['Street']}. Tapez \`help\` pour demander conseil.`);
+                    const hacker = famousHackers['Street'] || defaultNPC;
+                    appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
                     updateLocation();
                 } else {
                     appendOutput("Fuite échouée ! Les autorités vous ont attrapé.");
@@ -542,7 +550,8 @@
                     gameState.currentLocation = exits[direction].to;
                     appendOutput(`Vous vous déplacez vers ${gameState.currentLocation}.`);
                     appendOutput(locations[gameState.currentLocation].description);
-                    appendOutput(`Hacker en charge: ${famousHackers[gameState.currentLocation]}. Tapez \`help\` pour demander conseil.`);
+                    const hacker = famousHackers[gameState.currentLocation] || defaultNPC;
+                    appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
                     updateLocation();
                     if (gameState.alarmActive) {
                         addToCountdown(10);
@@ -553,45 +562,49 @@
             }
         }
 
-        function locpick(target) {
+        function locpick() {
             const current = gameState.currentLocation;
             const exits = locations[current].exits;
-            let targetDirection = null;
+            let lockedExit = null;
+            let doorType = "";
 
-            switch(target) {
-                case 'gate':
-                    targetDirection = 'n';
+            for (let direction in exits) {
+                if (exits[direction].locked) {
+                    lockedExit = direction;
                     break;
-                case 'door':
-                    targetDirection = 'e';
-                    break;
-                case 'server':
-                    targetDirection = 'n';
-                    break;
-                case 'datacenter':
-                    targetDirection = 'e';
-                    break;
-                default:
-                    appendOutput("Commande invalide. Utilisez `locpick gate`, `locpick door`, `locpick server`, ou `locpick datacenter`.");
-                    return;
+                }
             }
 
-            if (exits[targetDirection] && exits[targetDirection].locked) {
-                appendOutput(`Vous tentez de déverrouiller le ${target}. Cela nécessite une expertise en lockpicking.`);
+            if (lockedExit) {
+                switch(current) {
+                    case 'Control Room':
+                        doorType = 'portail renforcé';
+                        break;
+                    case 'Reinforced Gate':
+                        doorType = 'porte sécurisée';
+                        break;
+                    case 'Secured Door':
+                        doorType = 'porte du serveur';
+                        break;
+                    default:
+                        doorType = 'porte';
+                }
+
+                appendOutput(`Vous tentez de déverrouiller le ${doorType}...`);
                 const success = Math.random() < 0.6;
                 setTimeout(() => {
                     if (success) {
-                        exits[targetDirection].locked = false;
-                        appendOutput(`Vous avez réussi à déverrouiller le ${target}. Vous pouvez maintenant passer.`);
-                        if (current === 'Server Door' && target === 'datacenter') {
+                        exits[lockedExit].locked = false;
+                        appendOutput(`Vous avez réussi à déverrouiller le ${doorType}. Vous pouvez maintenant passer.`);
+                        if (current === 'Server Door') {
                             accessDatacenter();
                         }
                     } else {
-                        appendOutput(`Échec du déverrouillage du ${target}. Essayez à nouveau ou trouvez un autre moyen.`);
+                        appendOutput(`Échec du déverrouillage du ${doorType}. Essayez à nouveau ou trouvez un autre moyen.`);
                     }
                 }, 2000);
             } else {
-                appendOutput(`Il n'y a pas de ${target} verrouillée ici.`);
+                appendOutput("Il n'y a aucune porte verrouillée ici à déverrouiller.");
             }
         }
 
@@ -616,7 +629,8 @@
         function gameWon() {
             appendOutput("Félicitations ! Vous avez réussi votre mission.");
             appendOutput("Vous avez gagné le jeu !");
-            appendOutput("Hack the planet! Vous avez pris le contrôle de milliers d'ordinateurs à travers le monde.");
+            // Suppression de la duplication du message
+            // appendOutput("Hack the planet! Vous avez pris le contrôle de milliers d'ordinateurs à travers le monde.");
             input.disabled = true;
             clearInterval(countdownTimer);
             countdown.style.display = "none";
@@ -706,9 +720,10 @@
         }
 
         function initializeGame() {
-            appendOutput("Ceci est une simulation");
+            appendOutput("Ceci est une simulation. Explorez la pour découvrir ses vulnérabilités.");
             appendOutput(locations[gameState.currentLocation].description);
-            appendOutput(`Hacker en charge: ${famousHackers[gameState.currentLocation]}. Tapez \`help\` pour demander conseil.`);
+            const hacker = famousHackers[gameState.currentLocation] || defaultNPC;
+            appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
         }
 
         initializeGame();
