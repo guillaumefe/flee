@@ -146,20 +146,25 @@
             'Office': { 
                 description: 'Vous êtes dans le bureau administratif. Des dossiers importants sont ici.', 
                 exits: { 
-                    's': { to: 'Lobby', locked: false } 
+                    's': { to: 'Lobby', locked: false },
+                    'e': { to: 'Social Engineering Lab', locked: false },
+                    'w': { to: 'Penetration Testing Room', locked: false }
                 }
             },
             'Server Room': { 
                 description: 'Salle des serveurs. Les machines bourdonnent.', 
                 exits: { 
-                    'o': { to: 'Lobby', locked: false } 
+                    'o': { to: 'Lobby', locked: false },
+                    'e': { to: 'Malware Development Lab', locked: false }
                 }
             },
             'Control Room': { 
                 description: 'Salle de contrôle. Des écrans montrent diverses données de sécurité.', 
                 exits: { 
                     'e': { to: 'Lobby', locked: false }, 
-                    'n': { to: 'Reinforced Gate', locked: true } 
+                    'n': { to: 'Reinforced Gate', locked: true },
+                    'w': { to: 'Reverse Engineering Suite', locked: false },
+                    's': { to: 'Cloud Security Center', locked: false }
                 }
             },
             'Reinforced Gate': { 
@@ -194,6 +199,43 @@
                 exits: { 
                     'n': { to: 'Lobby', locked: false } 
                 }
+            },
+            // Nouveaux lieux
+            'Social Engineering Lab': {
+                description: 'Laboratoire de Social Engineering. Des outils et ressources pour manipuler les humains.', 
+                exits: { 
+                    'w': { to: 'Office', locked: false } 
+                }
+            },
+            'Malware Development Lab': {
+                description: 'Laboratoire de Développement de Malware. Des équipements pour créer des logiciels malveillants.', 
+                exits: { 
+                    'w': { to: 'Server Room', locked: false } 
+                }
+            },
+            'Reverse Engineering Suite': {
+                description: 'Suite de Reverse Engineering. Des postes de travail pour analyser et décoder des logiciels.', 
+                exits: { 
+                    'e': { to: 'Control Room', locked: false } 
+                }
+            },
+            'Cloud Security Center': {
+                description: 'Centre de Sécurité Cloud. Des outils pour sécuriser les infrastructures cloud.', 
+                exits: { 
+                    'n': { to: 'Control Room', locked: false } 
+                }
+            },
+            'Penetration Testing Room': {
+                description: 'Salle de Penetration Testing. Des simulateurs d\'attaques pour tester les défenses.', 
+                exits: { 
+                    'e': { to: 'Office', locked: false } 
+                }
+            },
+            'Free Software Lab': {
+                description: 'Laboratoire du Logiciel Libre. Un espace dédié au développement et à la promotion des logiciels libres.', 
+                exits: { 
+                    'w': { to: 'Office', locked: false } 
+                }
             }
         };
 
@@ -203,8 +245,14 @@
             'Server Room': 'Gary McKinnon',
             'Control Room': 'Albert Gonzalez',
             'Street': 'Anonymous',
-            'Datacenter': 'Linus Torvalds'
-            // Les autres localisations n'ont pas de NPC assigné
+            'Datacenter': 'Linus Torvalds',
+            // Nouveaux NPCs
+            'Social Engineering Lab': 'Julien Assengce',
+            'Malware Development Lab': 'Baptiste Robert',
+            'Reverse Engineering Suite': 'MiCode',
+            'Cloud Security Center': 'Alice Dupont',
+            'Penetration Testing Room': 'Maxime Legrand',
+            'Free Software Lab': 'Richard Stallman'
         };
 
         const npcHelp = {
@@ -273,6 +321,73 @@
                     1: "Pour contribuer à Linux, commence par choisir un aspect qui t'intéresse, étudier le code existant, et soumettre des contributions via les canaux officiels.",
                     2: "Linux offre une grande flexibilité, une sécurité renforcée, et une vaste communauté de développeurs qui contribuent constamment à son amélioration."
                 }
+            },
+            // Nouveaux NPCs
+            'Julien Assengce': {
+                description: "Je suis Julien Assengce, expert en Social Engineering. Comment puis-je t'aider ?",
+                questions: [
+                    "1. Qu'est-ce que le Social Engineering ?",
+                    "2. Comment se protéger contre le Social Engineering ?"
+                ],
+                answers: {
+                    1: "Le Social Engineering est l'art de manipuler les individus pour obtenir des informations confidentielles. Cela peut inclure des techniques comme le phishing ou le pretexting.",
+                    2: "Pour se protéger, il est essentiel de sensibiliser les employés, de vérifier les identités avant de divulguer des informations sensibles, et de mettre en place des protocoles de sécurité stricts."
+                }
+            },
+            'Baptiste Robert': {
+                description: "Je suis Baptiste Robert, spécialiste en Développement de Malware. Que veux-tu savoir ?",
+                questions: [
+                    "1. Comment les malwares se propagent-ils ?",
+                    "2. Quelles sont les méthodes courantes de création de Malware ?"
+                ],
+                answers: {
+                    1: "Les malwares se propagent via des emails de phishing, des téléchargements infectés, des vulnérabilités de logiciels, et des réseaux compromis.",
+                    2: "Les méthodes incluent l'utilisation de code malveillant, l'exploitation de vulnérabilités, et la dissimulation via des techniques de chiffrement ou de polymorphisme."
+                }
+            },
+            'MiCode': {
+                description: "Je suis MiCode, analyste en Reverse Engineering. Que veux-tu savoir ?",
+                questions: [
+                    "1. Qu'est-ce que le Reverse Engineering ?",
+                    "2. Pourquoi le Reverse Engineering est-il important en sécurité ?"
+                ],
+                answers: {
+                    1: "Le Reverse Engineering consiste à décomposer un logiciel pour comprendre son fonctionnement interne, souvent utilisé pour analyser des malwares.",
+                    2: "Il permet de découvrir des vulnérabilités, de comprendre les mécanismes des attaques, et de développer des défenses efficaces."
+                }
+            },
+            'Alice Dupont': {
+                description: "Je suis Alice Dupont, experte en Sécurité Cloud. Comment puis-je t'assister ?",
+                questions: [
+                    "1. Quels sont les principaux risques de sécurité dans le Cloud ?",
+                    "2. Comment sécuriser une infrastructure Cloud ?"
+                ],
+                answers: {
+                    1: "Les principaux risques incluent les violations de données, les configurations incorrectes, les attaques par déni de service, et l'accès non autorisé.",
+                    2: "Utilisez des contrôles d'accès stricts, chiffrez les données, surveillez les activités suspectes, et appliquez les meilleures pratiques de configuration."
+                }
+            },
+            'Maxime Legrand': {
+                description: "Je suis Maxime Legrand, consultant en Penetration Testing. Que souhaites-tu savoir ?",
+                questions: [
+                    "1. Qu'est-ce que le Penetration Testing ?",
+                    "2. Quels outils sont utilisés pour le Penetration Testing ?"
+                ],
+                answers: {
+                    1: "Le Penetration Testing est une méthode d'évaluation de la sécurité d'un système en simulant des attaques réelles pour identifier les vulnérabilités.",
+                    2: "Des outils comme Metasploit, Nmap, Burp Suite, et Wireshark sont couramment utilisés pour scanner, exploiter et analyser les systèmes."
+                }
+            },
+            'Richard Stallman': {
+                description: "Je suis Richard Stallman, défenseur du logiciel libre. Que veux-tu savoir ?",
+                questions: [
+                    "1. Qu'est-ce que le logiciel libre ?",
+                    "2. Comment le logiciel libre contribue-t-il à la sécurité informatique ?"
+                ],
+                answers: {
+                    1: "Le logiciel libre est un logiciel dont le code source est librement accessible, modifiable et redistribuable par tous.",
+                    2: "Le logiciel libre favorise la transparence et la collaboration, ce qui permet de détecter et corriger rapidement les vulnérabilités, renforçant ainsi la sécurité informatique."
+                }
             }
         };
 
@@ -317,6 +432,49 @@
                     "Linus Torvalds: Bonjour! Vous souhaitez contribuer au projet Linux?",
                     "Linus Torvalds: Linux est un système d'exploitation puissant et flexible.",
                     "Linus Torvalds: Rejoignez-nous et aidez à améliorer le monde de l'open source."
+                ]
+            },
+            // Nouveaux NPCs
+            'Julien Assengce': {
+                dialogues: [
+                    "Julien Assengce: Le Social Engineering est un art subtil. Utilise-le avec précaution.",
+                    "Julien Assengce: Toujours vérifier les identités avant de partager des informations sensibles.",
+                    "Julien Assengce: La confiance est ta plus grande arme et ta plus grande faiblesse."
+                ]
+            },
+            'Baptiste Robert': {
+                dialogues: [
+                    "Baptiste Robert: Le développement de malware requiert une compréhension approfondie des systèmes.",
+                    "Baptiste Robert: Toujours tester tes créations dans des environnements sécurisés.",
+                    "Baptiste Robert: L'éthique est essentielle dans le développement de logiciels."
+                ]
+            },
+            'MiCode': {
+                dialogues: [
+                    "MiCode: Le Reverse Engineering dévoile les secrets cachés des logiciels.",
+                    "MiCode: Utilise les bons outils pour analyser efficacement.",
+                    "MiCode: Chaque ligne de code raconte une histoire. Apprends à la lire."
+                ]
+            },
+            'Alice Dupont': {
+                dialogues: [
+                    "Alice Dupont: La sécurité dans le Cloud est différente de celle des infrastructures traditionnelles.",
+                    "Alice Dupont: Chiffre toujours tes données avant de les stocker dans le Cloud.",
+                    "Alice Dupont: Surveille les accès et les activités pour prévenir les intrusions."
+                ]
+            },
+            'Maxime Legrand': {
+                dialogues: [
+                    "Maxime Legrand: Le Penetration Testing est crucial pour identifier les vulnérabilités avant les attaquants.",
+                    "Maxime Legrand: Documente toujours tes découvertes et propose des solutions.",
+                    "Maxime Legrand: La persévérance est la clé pour un test de pénétration réussi."
+                ]
+            },
+            'Richard Stallman': {
+                dialogues: [
+                    "Richard Stallman: Le logiciel libre est fondamental pour une cybersécurité transparente.",
+                    "Richard Stallman: En partageant le code source, nous renforçons la confiance et la sécurité des logiciels.",
+                    "Richard Stallman: Défendre le logiciel libre, c'est défendre la liberté et la sécurité numérique."
                 ]
             }
         };
@@ -483,6 +641,7 @@
                     case 'e': return 'Est';
                     case 's': return 'Sud';
                     case 'o': return 'Ouest';
+                    case 'w': return 'Ouest';
                     default: return dir;
                 }
             }).join(', ');
@@ -533,6 +692,23 @@
                     const hacker = famousHackers['Street'] || defaultNPC;
                     appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
                     updateLocation();
+
+                    // Ajout de 40 secondes de répit
+                    appendOutput("Vous avez obtenu 40 secondes de répit.");
+                    gameState.countdown += 40;
+                    appendOutput(`Compte à rebours de l'alarme : ${gameState.countdown} secondes.`);
+                    
+                    // Réinitialisation du timer
+                    clearInterval(countdownTimer);
+                    countdownTimer = setInterval(() => {
+                        gameState.countdown--;
+                        appendOutput(`Compte à rebours de l'alarme : ${gameState.countdown} secondes.`);
+                        if (gameState.countdown <= 0) {
+                            clearInterval(countdownTimer);
+                            countdown.style.display = "none";
+                            triggerArrest();
+                        }
+                    }, 1000);
                 } else {
                     appendOutput("Fuite échouée ! Les autorités vous ont attrapé.");
                     triggerArrest();
@@ -585,6 +761,9 @@
                         break;
                     case 'Secured Door':
                         doorType = 'porte du serveur';
+                        break;
+                    case 'Free Software Lab':
+                        doorType = 'porte du Laboratoire du Logiciel Libre';
                         break;
                     default:
                         doorType = 'porte';
@@ -720,7 +899,7 @@
         }
 
         function initializeGame() {
-            appendOutput("Ceci est une simulation. Explorez la pour découvrir ses vulnérabilités.");
+            appendOutput("Bienvenue dans Hacker en Charge. Explorez les systèmes pour découvrir des vulnérabilités.");
             appendOutput(locations[gameState.currentLocation].description);
             const hacker = famousHackers[gameState.currentLocation] || defaultNPC;
             appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
