@@ -135,7 +135,14 @@
 
         const locations = {
             'Lobby': { 
-                description: 'Vous êtes dans le lobby principal. Des portes mènent vers différents secteurs.', 
+                description: 'Vous êtes dans le lobby principal. Des portes mènent vers différents secteurs.<br><br>' +
+                            'Vous pouvez taper la commande <span style="font-family: \'Courier New\'; color: red;">\'look\'</span> pour regarder autour de vous. <br>' +
+                            'Et les commandes' +
+                            '<span style="font-family: \'Courier New\'; color: red;">\'n\'</span>, ' +
+                            '<span style="font-family: \'Courier New\'; color: red;">\'e\'</span>, ' +
+                            '<span style="font-family: \'Courier New\'; color: red;">\'s\'</span> ou ' +
+                            '<span style="font-family: \'Courier New\'; color: red;">\'o\'</span> ' +
+                            'pour vous déplacer au Nord, à l\'Est, au Sud ou à l\'Ouest.',
                 exits: { 
                     'n': { to: 'Office', locked: false }, 
                     'e': { to: 'Server Room', locked: false }, 
@@ -481,7 +488,7 @@
 
         function appendOutput(text) {
             const newLine = document.createElement('p');
-            newLine.textContent = text;
+            newLine.innerHTML = text;
             output.appendChild(newLine);
             output.scrollTop = output.scrollHeight;
         }
@@ -509,9 +516,16 @@
                 if (npcInfo && npcInfo.answers[questionNumber]) {
                     const answer = npcInfo.answers[questionNumber];
                     appendOutput(answer);
-                    appendOutput("Tapez un autre numéro ou 'exit' pour quitter l'aide.");
+                    appendOutput("Tapez un autre numéro ou <strong>exit</strong> pour quitter l'aide.");
                 } else {
-                    appendOutput("Choix invalide. Essayez à nouveau.");
+                    appendOutput(`
+                        <div>
+                            Choix invalide. Essayez à nouveau.
+                            <p style="color: red; font-weight: bold;">
+                                Vous êtes actuellement dans l'aide. Vous devez taper 'exit' pour reprendre le cours normal du jeu.
+                            </p>
+                        </div>
+                    `);
                 }
             }
         }
@@ -600,7 +614,7 @@
                     if (['n', 'e', 's', 'o'].includes(command)) {
                         handleMovement(command);
                     } else {
-                        appendOutput("Commande inconnue. Tapez 'help' pour obtenir de l'aide.");
+                        appendOutput(`Commande inconnue. Tapez <span style="font-family: 'Courier New'; color: red;">'help'</span> pour obtenir de l'aide.`);
                     }
             }
         }
@@ -902,7 +916,7 @@
             appendOutput("Bienvenue dans Hacker en Charge. Explorez les systèmes environnants pour découvrir des vulnérabilités.");
             appendOutput(locations[gameState.currentLocation].description);
             const hacker = famousHackers[gameState.currentLocation] || defaultNPC;
-            appendOutput(`Hacker en charge: ${hacker}. Tapez \`help\` pour demander conseil.`);
+            appendOutput(`Hacker en charge: ${hacker}. Tapez <span style="font-family: 'Courier New'; color: red;">'help'</span> pour demander conseil.`);
         }
 
         initializeGame();
